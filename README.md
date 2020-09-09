@@ -6,3 +6,9 @@
 0. /enable_door - Включает электронный замок 
 ## Зависимости
 --
+
+## ДЛя отладки 
+Тестовый стенд для телеграм бота: 
+бот: @cki_test_door_bot
+key = '1094145999:AAHrnh0rbhqypsFn44cDqtQqdcPkEMrtVrk'.
+
