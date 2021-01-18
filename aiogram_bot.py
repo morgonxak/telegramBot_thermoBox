@@ -6,7 +6,7 @@ from aiogram import Bot, Dispatcher, executor, types
 from moduls.dataBase import DATA_BASE_TELEGRAM_BOT
 from moduls.config import *
 from aiogram.types import InputFile
-
+# from moduls.report.create_html_report import report_1
 
 # задаем уровень логов
 logging.basicConfig(level=logging.INFO)
@@ -17,18 +17,17 @@ dp = Dispatcher(bot)
 
 db = DATA_BASE_TELEGRAM_BOT(path_database_file, path_save_image)
 
+
+
+userSub = False
+
+
 # Команда активации подписки
 @dp.message_handler(commands=['subscribe'])
 async def subscribe(message: types.Message):
-    if (not db.subscriber_exists(message.from_user.id)):
-        # если юзера нет в базе, добавляем его
-        db.add_subscriber(message.from_user.id)
-    else:
-        # если он уже есть, то просто обновляем ему статус подписки
-        db.update_subscription(message.from_user.id, True)
-
-    await message.answer(
-        "Вы успешно подписались на рассылку!\nЖдите, скоро выйдут новые обзоры и вы узнаете о них первыми =)")
+    global userSub
+    userSub = True
+    await message.answer("Введите код")
 
 
 # Команда отписки
@@ -38,13 +37,48 @@ async def unsubscribe(message: types.Message):
         # если юзера нет в базе, добавляем его с неактивной подпиской (запоминаем)
         db.add_subscriber(message.from_user.id, False)
         await message.answer("Вы итак не подписаны.")
-
     else:
         # если он уже есть, то просто обновляем ему статус подписки
         db.update_subscription(message.from_user.id, False)
+        userSub = False
         await message.answer("Вы успешно отписаны от рассылки.")
 
+@dp.message_handler(content_types=["text"])
+async def enterPass(message: types.Message):
+    global userSub
+    if(userSub and message.text==passw):
+        if (not db.subscriber_exists(message.from_user.id)):
+            # если юзера нет в базе, добавляем его
+            db.add_subscriber(message.from_user.id)
+        else:
+            # если он уже есть, то просто обновляем ему статус подписки
+            db.update_subscription(message.from_user.id, True)
+        await message.answer(
+            "Вы успешно подписались на рассылку!\nЖдите, скоро выйдут новые обзоры и вы узнаете о них первыми =)")
+    elif(userSub and message.text!=passw):
+        await message.answer("Код неверен")
+    userSub = False
 
+# @dp.message_handler(commands=[''])
+
+# Команда отписки
+# @dp.message_handler(commands=['report'])
+# async def get_report(message: types.Message):
+#     if (not db.subscriber_exists(message.from_user.id)):
+#         # если юзера нет в базе
+#         await message.answer("Вы не авторизированны.")
+#     else:
+#         pass
+#         # если он уже есть
+#         # id = message.from_user.id
+#         #
+#         # period, data_db = db.get_data_for_report_1()
+#         # print(period, data_db)
+#         # rath_pdf_file = report_1(period, data_db, '/home/dima/PycharmProjects/telegramBot_thermobox/moduls/report/temp')
+#         #
+#         # agenda = InputFile(rath_pdf_file, filename="{}_{}.pdf".format(period[0].replace(' ', '_'), period[1].replace(' ', '_')))
+#         # await bot.send_document(id, agenda)
+#
 # @dp.message_handler(commands=['menu'])
 # async def get_menu(message: types.Message):
 #     markup = types.ReplyKeyboardMarkup(row_width=1)
