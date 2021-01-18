@@ -1,0 +1,5 @@
+aiogram
+telebot
+busio
+adafruit-circuitpython-bme280
+opencv-python
