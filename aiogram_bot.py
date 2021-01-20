@@ -1,6 +1,7 @@
-from moduls import config
+from moduls import config, len
 import logging
 import asyncio
+import subprocess
 
 from aiogram import Bot, Dispatcher, executor, types
 from moduls.dataBase import DATA_BASE_TELEGRAM_BOT
@@ -17,23 +18,22 @@ dp = Dispatcher(bot)
 
 db = DATA_BASE_TELEGRAM_BOT(path_database_file, path_save_image)
 
-
-
 userSub = False
-
-
 # Команда активации подписки
+
+
 @dp.message_handler(commands=['subscribe'])
 async def subscribe(message: types.Message):
     global userSub
     userSub = True
-    await message.answer("Введите код")
+    await message.answer("введите код")
 
 
 # Команда отписки
 @dp.message_handler(commands=['unsubscribe'])
 async def unsubscribe(message: types.Message):
-    if (not db.subscriber_exists(message.from_user.id)):
+    global userSub
+    if not db.subscriber_exists(message.from_user.id):
         # если юзера нет в базе, добавляем его с неактивной подпиской (запоминаем)
         db.add_subscriber(message.from_user.id, False)
         await message.answer("Вы итак не подписаны.")
@@ -43,23 +43,55 @@ async def unsubscribe(message: types.Message):
         userSub = False
         await message.answer("Вы успешно отписаны от рассылки.")
 
-@dp.message_handler(content_types=["text"])
-async def enterPass(message: types.Message):
-    global userSub
-    if(userSub and message.text==passw):
-        if (not db.subscriber_exists(message.from_user.id)):
-            # если юзера нет в базе, добавляем его
-            db.add_subscriber(message.from_user.id)
-        else:
-            # если он уже есть, то просто обновляем ему статус подписки
-            db.update_subscription(message.from_user.id, True)
-        await message.answer(
-            "Вы успешно подписались на рассылку!\nЖдите, скоро выйдут новые обзоры и вы узнаете о них первыми =)")
-    elif(userSub and message.text!=passw):
-        await message.answer("Код неверен")
-    userSub = False
 
-# @dp.message_handler(commands=[''])
+# отчет о работоспособности устройства
+@dp.message_handler(commands=['ping'])
+async def pingm(message: types.Message):
+    await message.answer("отчет о работоспособности")
+    # проверяет тепловизор(68 или 69)
+    therm = subprocess.Popen("sudo i2cdetect -y 1 | grep 68", shell=True, stdout=subprocess.PIPE)
+    out = therm.stdout.read()
+
+    # await message.answer("тепловизор: "+str(out))
+    if out:
+        await message.answer("тепловизор работает")
+    else:
+        therm = subprocess.Popen("sudo i2cdetect -y 1 | grep 69", shell=True, stdout=subprocess.PIPE)
+        out = therm.stdout.read()
+        # await message.answer("тепловизор: " + str(out))
+        if out:
+            await message.answer("тепловизор работает")
+        else:
+            await message.answer("тепловизор не работает")
+
+    # проверяет нижний пирометр(5a)
+    pyro = subprocess.Popen("sudo i2cdetect -y 1 | grep 5a", shell=True, stdout=subprocess.PIPE)
+    out = pyro.stdout.read()
+    # await message.answer("пирометр: "+str(out))
+    if out:
+        await message.answer("нижний пирометр работает")
+    else:
+        await message.answer("нижний пирометр не работает")
+
+    # проверяет камеру
+    cam = subprocess.Popen("sudo vcgencmd get_camera | grep detected=1", shell=True, stdout=subprocess.PIPE)
+    out = cam.stdout.read()
+    # await message.answer("камера: "+str(out))
+    if out:
+        await message.answer("камера работает")
+    else:
+        await message.answer("камера не работает")
+
+    # проверяет дальнометр
+    if len.len():
+        await message.answer("дальнометр работает")
+    else:
+        await message.answer("дальнометр не работает")
+
+
+
+
+
 
 # Команда отписки
 # @dp.message_handler(commands=['report'])
@@ -113,10 +145,27 @@ async def send_out_sick():
                     disable_notification=True
                 )
 
-
 def repeat(coro, loop):
     asyncio.ensure_future(coro(), loop=loop)
     loop.call_later(DELAY, repeat, coro, loop)
+
+
+# проверка введенного пароля
+@dp.message_handler(content_types=["text"])
+async def enterpass(message: types.Message):
+    global userSub
+    if userSub and message.text == config.passw:
+        if not db.subscriber_exists(message.from_user.id):
+            # если юзера нет в базе, добавляем его
+            db.add_subscriber(message.from_user.id)
+        else:
+            # если он уже есть, то просто обновляем ему статус подписки
+            db.update_subscription(message.from_user.id, True)
+        await message.answer(
+            "Вы успешно подписались на рассылку!\nЖдите, скоро выйдут новые обзоры и вы узнаете о них первыми =)")
+        userSub = False
+    elif userSub and message.text != config.passw:
+        await message.answer("Код неверен")
 
 # запускаем лонг поллинг
 if __name__ == '__main__':
