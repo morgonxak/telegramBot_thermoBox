@@ -1,0 +1,17 @@
+[Unit]
+Description=thermobox_telegram
+After=multi-user.target
+Conflicts=getty@tty1.service
+StartLimitBurst=5
+StartLimitIntervalSec=33
+
+[Service]
+Restart=always
+RestartSec=20
+Type=simple
+WorkingDirectory=/home/pi/project/telegramBot_thermobox
+ExecStart=/home/pi/project/venv/thermopost/bin/python aiogram_bot.py
+StandardInput=tty-force
+
+[Install]
+WantedBy=multi-user.target
