@@ -7,8 +7,8 @@ from moduls.door_lock import door_lock
 import telebot
 from telebot import types
 
-test_key_bot = '1350151278:AAFiJZMSdAT5DTNNfUA3C-jVdx8RQDwI3Vg'
-IP_DOOR = '192.168.0.196'
+test_key_bot = '1450986513:AAEiDVsKkUM2dYx_IoEV7_xCXq-Xz4_IMzE'
+IP_DOOR = '127.0.0.1'
 POST_DOOR = 9091
 DEBUG = False
 

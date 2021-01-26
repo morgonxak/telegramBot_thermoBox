@@ -1,0 +1,29 @@
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <title>Моя первая страничка</title>
+
+
+</head>
+<body>
+    <h1>За последнюю неделю: {{ data }}</h1>
+    <table border="1">
+        <tr>
+
+            <th>Дата/время</th>
+            <th>ФИО</th>
+            <th>Тепловизор, С</th>
+            <th>Пирометр, С</th>
+            <th>Решение</th>
+            <th>Фото</th>
+
+        </tr>
+        {% for row in info %}
+        <tr>
+            {% for count in range(0, 5): %}
+            <td>{{ row[count] }}</td>
+            {% endfor %}
+            <td><img src="{{ row[5] }}" alt='1' width="120" height="90" /></td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
