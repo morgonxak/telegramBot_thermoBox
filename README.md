@@ -24,8 +24,17 @@ pip install busio
 pip install adafruit-circuitpython-bme280
 pip install opencv-python
 
-## ДЛя отладки 
+## Для отладки 
 Тестовый стенд для телеграм бота: 
 бот: @cmitbot
 key = '122098803:AAE5b0l6s9XRVLvIn8-PIepNjOXwWff3r_8'
 
+## Настройка коробки для обновлений через гит
+0. Тестировать обновляется ли система в ветке testupdate она сделана специально для этого
+0. Запустить settingGitUpdate.sh (bash settingGitUpdate.sh)
+0. Поместить ssh ключ по пути ~/.ssh
+0. Выполнить команду git fetch
+0. Выполнить команду git merge origin master --allow-unrelated-histories
+0. Устранить появившиеся конфликты
+0. Запустить settingCron.sh (./settingCron.sh)
+0. Командой crontab -e настроить нужное расписание обновлений
