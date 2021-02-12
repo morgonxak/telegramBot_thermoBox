@@ -35,7 +35,6 @@ key = '122098803:AAE5b0l6s9XRVLvIn8-PIepNjOXwWff3r_8'
 0. Поместить ssh ключ по пути ~/.ssh
 0. Выполнить команду git fetch --all
 0. Выполнить команду git reset --hard origin/master
-0. Устранить появившиеся конфликты
 0. Запустить settingCron.sh (./settingCron.sh)
 0. Командой crontab -e настроить нужное расписание обновлений
 0. Дождаться выполнения cron расписания и выполнить git status, если требуется коммит, то добавить строку git commit -m"update" после git merge в updateGit.sh
