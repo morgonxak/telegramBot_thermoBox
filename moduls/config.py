@@ -11,4 +11,4 @@ DELAY = 0.1
 path_database_file = '/home/pi/project/termoBox-9_9_20/rc/database.bd'
 #path_database_file = r'C:\Users\user\Desktop\vsyakoe\instC\telegramBot_thermobox\rc\database.bd'
 
-passw = "Termobox"
+passw = "19942561994"
